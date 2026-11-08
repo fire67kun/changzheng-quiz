@@ -150,7 +150,7 @@ footer{margin-top:26px; font-size:12.4px; color:var(--grey); text-align:center; 
 footer span{color:var(--red)}
 
 /* 题号水印 */
-.ghost{
+#ghost{
   position:absolute; right:14px; top:2px; font-size:78px; line-height:1; letter-spacing:2px;
   color:rgba(176,58,46,.075); font-family:"Kaiti SC","KaiTi",serif; pointer-events:none; user-select:none;
 }
@@ -165,12 +165,203 @@ footer span{color:var(--red)}
   .lead{font-size:18px}
   .q{font-size:19px}
   .opt{font-size:15px; padding:9px 11px}
-  .ghost{font-size:58px; right:10px}
+  #ghost{font-size:58px; right:10px}
   .btn{width:100%}
   .foot{justify-content:stretch}
   .score{font-size:48px}
   .review .item{font-size:13.6px}
 }
+
+/* ================= 主题增强：字体 · 动效 · 细节 ================= */
+:root{
+  --f-disp:"STLiti","隶书","STXingkai","华文行楷","KaiTi","楷体",serif;
+  --f-body:"Songti SC","STSong","SimSun","宋体",serif;
+  --f-num:"Georgia","Times New Roman",serif;
+}
+body{font-family:var(--f-body)}
+
+/* 背景缓慢流动的暖色光斑 */
+body::after{
+  content:""; position:fixed; inset:-20%; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(38% 30% at 18% 18%, rgba(176,58,46,.075), transparent 62%),
+    radial-gradient(34% 26% at 84% 26%, rgba(47,93,98,.06), transparent 62%),
+    radial-gradient(44% 34% at 62% 88%, rgba(201,138,46,.075), transparent 62%);
+  animation:drift 28s ease-in-out infinite alternate;
+}
+@keyframes drift{
+  from{transform:translate3d(-2.5%,-1.5%,0) scale(1)}
+  to{transform:translate3d(2.5%,2%,0) scale(1.08)}
+}
+
+/* 报头：隶书标题 + 印章落下 + 红线生长 */
+.mast h1{font-family:var(--f-disp); font-size:31px; letter-spacing:6px; font-weight:400; position:relative}
+.mast h1::after{
+  content:""; position:absolute; left:1px; right:0; bottom:-7px; height:1px;
+  background:linear-gradient(90deg, var(--red), rgba(176,58,46,0));
+  transform:scaleX(0); transform-origin:left; animation:grow 1.1s .15s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes grow{to{transform:scaleX(1)}}
+.seal{animation:sealIn .75s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes sealIn{
+  0%{transform:rotate(-16deg) scale(2.1); opacity:0}
+  70%{transform:rotate(-1deg) scale(.97); opacity:1}
+  100%{transform:rotate(-2.2deg) scale(1)}
+}
+
+/* 卡片顶部一条断续的朱线，像装订线 */
+.card{position:relative}
+.card::before{
+  content:""; position:absolute; left:0; right:0; top:0; height:3px;
+  background:repeating-linear-gradient(90deg, var(--red) 0 7px, transparent 7px 15px);
+  opacity:.45;
+}
+
+/* 首页标题逐字浮现 */
+.lead{font-family:var(--f-disp); font-size:24px; letter-spacing:2px}
+.lead .ch{display:inline-block; opacity:0; transform:translateY(7px); animation:chIn .55s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes chIn{to{opacity:1; transform:none}}
+
+/* 进度：一条行军刻度 */
+.dots i{width:16px; height:3px; background:#d9cbb2; transition:transform .25s ease, background .25s ease}
+.dots i.done{background:var(--ink)}
+.dots i.now{background:var(--red); transform:scaleY(2.4); transform-origin:center}
+
+/* 选项：左侧朱条从上方落下 */
+.opt{position:relative; overflow:hidden; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease}
+.opt::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--red); transform:scaleY(0); transform-origin:top; transition:transform .2s ease;
+}
+.opt:hover:not(.locked)::before{transform:scaleY(1)}
+.opt:hover:not(.locked){transform:translateX(2px); box-shadow:3px 3px 0 rgba(58,50,42,.12)}
+.opt.right{animation:stampIn .38s cubic-bezier(.2,.9,.3,1.3)}
+.opt.wrong{animation:shake .32s ease}
+@keyframes stampIn{0%{transform:scale(1.035)}55%{transform:scale(.99)}100%{transform:scale(1)}}
+@keyframes shake{12%,88%{transform:translateX(-2px)}32%,68%{transform:translateX(3px)}52%{transform:translateX(-3px)}}
+
+/* 题号水印轻轻浮动 */
+#ghost{animation:floaty 7s ease-in-out infinite alternate}
+@keyframes floaty{from{transform:translateY(0)}to{transform:translateY(5px)}}
+
+/* 成绩页：数字与称号 */
+.score{font-family:var(--f-num); font-size:62px}
+#result.on .score{animation:scoreIn .7s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes scoreIn{0%{opacity:0; transform:scale(.82)}60%{opacity:1; transform:scale(1.04)}100%{transform:scale(1)}}
+.rank{font-family:var(--f-disp); font-size:30px; letter-spacing:9px; animation:inkIn .8s .1s ease both}
+@keyframes inkIn{
+  from{opacity:0; filter:blur(9px); letter-spacing:20px}
+  to{opacity:1; filter:blur(0); letter-spacing:9px}
+}
+.review h3{font-family:var(--f-disp); letter-spacing:3px; font-size:16px}
+
+/* 按钮：悬停时右下的硬阴影长出来 */
+.btn{transition:background .2s ease, color .2s ease, box-shadow .2s ease, transform .12s ease}
+.btn:hover{box-shadow:4px 4px 0 rgba(176,58,46,.22)}
+.btn:active{transform:translateY(1px)}
+
+/* 页脚的电波 */
+.morse{display:flex; gap:7px; justify-content:center; align-items:center; margin:22px 0 0; opacity:.42}
+.morse i{display:block; width:6px; height:6px; border-radius:50%; background:var(--red); animation:blink 2.6s infinite}
+.morse i.bar{width:17px; border-radius:2px}
+@keyframes blink{0%,72%,100%{opacity:.22}34%{opacity:1}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important}
+  .lead .ch{opacity:1; transform:none}
+}
+
+/* 右侧竖排诗句（窄屏隐藏） */
+.poem{
+  position:fixed; right:14px; top:104px; z-index:1; pointer-events:none; user-select:none;
+  writing-mode:vertical-rl; text-orientation:upright;
+  font-family:var(--f-disp); font-size:15px; line-height:2.7; letter-spacing:7px;
+  color:rgba(176,58,46,.28);
+}
+.poem span{display:block}
+.poem span + span{margin-right:16px; color:rgba(47,93,98,.24)}
+@media (max-width:920px){.poem{display:none}}
+
+/* 页脚边款 */
+.colophon{
+  text-align:center; margin:26px 0 0; font-size:11.5px; letter-spacing:6px;
+  color:rgba(58,50,42,.34); font-family:var(--f-body);
+}
+
+#home{min-height:0}
+#home .card{width:100%}
+.poem{top:50%; transform:translateY(-50%)}
+@media (max-height:700px){#home{min-height:0}}
+
+#home{min-height:0}
+#home .card{margin-top:34px}
+
+/* 时间线 */
+.timeline{position:relative; margin:38px 4px 0}
+.timeline::before{
+  content:""; position:absolute; left:5%; right:5%; top:3px; height:1px;
+  background:linear-gradient(90deg, rgba(58,50,42,0), rgba(58,50,42,.38), rgba(58,50,42,.38), rgba(58,50,42,0));
+}
+.timeline ul{display:flex; justify-content:space-between; margin:0; padding:20px 0 0; list-style:none}
+.timeline li{flex:1; text-align:center; position:relative; font-size:11.5px; letter-spacing:1px; color:rgba(58,50,42,.55)}
+.timeline li b{display:block; font-family:var(--f-num); font-weight:400; font-size:13px; color:rgba(58,50,42,.72); letter-spacing:.5px}
+.timeline li::before{
+  content:""; position:absolute; left:50%; top:-17px; width:6px; height:6px; border-radius:50%;
+  background:var(--red); transform:translateX(-50%); box-shadow:0 0 0 3px rgba(176,58,46,.10);
+  animation:pulse 3.2s ease-in-out infinite;
+}
+.timeline li:nth-child(2)::before{animation-delay:.4s}
+.timeline li:nth-child(3)::before{animation-delay:.8s}
+.timeline li:nth-child(4)::before{animation-delay:1.2s}
+.timeline li:nth-child(5)::before{animation-delay:1.6s}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(176,58,46,.08)}50%{box-shadow:0 0 0 6px rgba(176,58,46,.04)}}
+@media (max-width:560px){
+  .timeline li{font-size:10px}
+  .timeline li b{font-size:11px}
+  .timeline{margin-top:28px}
+}
+.colophon{display:none}
+
+/* ============ 背景装饰：纸的四周压暗 + 远山 + 雾 ============ */
+html{background:var(--paper)}
+.edge{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  box-shadow:inset 0 0 140px rgba(120,92,54,.10), inset 0 0 40px rgba(120,92,54,.05);
+}
+.scenery{
+  position:fixed; left:0; right:0; bottom:0; height:42vh; min-height:220px;
+  z-index:0; pointer-events:none; overflow:hidden;
+}
+.scenery i{position:absolute; left:-6%; bottom:0; width:112%; height:100%; display:block}
+.scenery .far{
+  background:linear-gradient(180deg, rgba(47,93,98,.16), rgba(47,93,98,.07));
+  filter:blur(2px); clip-path:polygon(0 100%,0 63%,4% 55%,9% 60%,14% 47%,19% 56%,24% 50%,30% 58%,36% 44%,42% 55%,48% 49%,54% 57%,60% 46%,66% 55%,72% 50%,78% 58%,84% 47%,90% 56%,96% 51%,100% 57%,100% 100%);
+  animation:sway 34s ease-in-out infinite alternate;
+}
+.scenery .near{
+  background:linear-gradient(180deg, rgba(58,50,42,.13), rgba(58,50,42,.04));
+  filter:blur(1px); clip-path:polygon(0 100%,0 80%,5% 73%,11% 78%,17% 68%,23% 76%,29% 70%,35% 79%,41% 67%,47% 75%,53% 70%,59% 78%,65% 69%,71% 77%,77% 71%,83% 78%,89% 69%,95% 76%,100% 72%,100% 100%);
+  animation:sway 26s ease-in-out infinite alternate-reverse;
+}
+.scenery .mist{
+  position:absolute; left:0; right:0; bottom:0; height:46%;
+  background:linear-gradient(180deg, rgba(242,232,213,0), rgba(242,232,213,.85));
+}
+
+.scenery .sun{
+  position:absolute; right:16%; bottom:22%; width:150px; height:150px; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,138,46,.20), rgba(201,138,46,.06) 45%, rgba(201,138,46,0) 70%);
+  filter:blur(2px);
+}
+@keyframes sway{
+  from{transform:translate3d(-1.6%,0,0)}
+  to{transform:translate3d(1.6%,0,0)}
+}
+@media (max-width:560px){
+  .scenery{height:32vh}
+}
+
+.morse{position:fixed; left:0; right:0; bottom:12px; margin:0; z-index:2}
 </style>
 </head>
 <body>
@@ -552,6 +743,112 @@ $('btnRestart').addEventListener('click', () => {
     idx = Math.min(Math.max(+m[1] - 1, 0), QS.length - 1);
     show('quiz'); renderQ();
   }
+})();
+</script>
+
+<script>
+(function () {
+  var lead = document.querySelector('#home .lead');
+  if (lead && !lead.dataset.done) {
+    var text = lead.textContent;
+    lead.textContent = '';
+    lead.dataset.done = '1';
+    for (var i = 0; i < text.length; i++) {
+      var sp = document.createElement('span');
+      sp.className = 'ch';
+      sp.textContent = text[i];
+      sp.style.animationDelay = (i * 55) + 'ms';
+      lead.appendChild(sp);
+    }
+  }
+  var wrap = document.querySelector('.wrap');
+  if (wrap && !document.querySelector('.morse')) {
+    var m = document.createElement('div');
+    m.className = 'morse';
+    m.setAttribute('aria-hidden', 'true');
+    var seq = ['dot','bar','dot','dot','bar','dot','bar','bar','dot'];
+    seq.forEach(function (k) {
+      var e = document.createElement('i');
+      if (k === 'bar') e.className = 'bar';
+      m.appendChild(e);
+    });
+    wrap.appendChild(m);
+  }
+})();
+</script>
+
+<script>
+(function () {
+  if (!document.querySelector('.poem')) {
+    var poem = document.createElement('div');
+    poem.className = 'poem';
+    poem.setAttribute('aria-hidden', 'true');
+    var a = document.createElement('span'); a.textContent = '雄关漫道真如铁';
+    var b = document.createElement('span'); b.textContent = '而今迈步从头越';
+    poem.appendChild(a); poem.appendChild(b);
+    document.body.appendChild(poem);
+  }
+  var wrap = document.querySelector('.wrap');
+  var morse = document.querySelector('.morse');
+  if (wrap && morse && !document.querySelector('.colophon')) {
+    var c = document.createElement('div');
+    c.className = 'colophon';
+    c.textContent = '一九三四 — 二〇二六';
+    wrap.insertBefore(c, morse);
+  }
+})();
+</script>
+
+<script>
+(function () {
+  var home = document.getElementById('home');
+  var card = home && home.querySelector('.card');
+  if (!card || home.querySelector('.timeline')) return;
+  var data = [
+    ['1934', '出发'],
+    ['1935', '遵义'],
+    ['1935', '到陕北'],
+    ['1936', '会师'],
+    ['2026', '九十年']
+  ];
+  var box = document.createElement('div');
+  box.className = 'timeline';
+  box.setAttribute('aria-hidden', 'true');
+  var ul = document.createElement('ul');
+  data.forEach(function (d) {
+    var li = document.createElement('li');
+    var b = document.createElement('b');
+    b.textContent = d[0];
+    li.appendChild(b);
+    li.appendChild(document.createTextNode(d[1]));
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  card.parentNode.insertBefore(box, card.nextSibling);
+})();
+</script>
+
+<script>
+(function () {
+  if (document.querySelector('.scenery')) return;
+  var edge = document.createElement('div');
+  edge.className = 'edge';
+  var sc = document.createElement('div');
+  sc.className = 'scenery';
+  sc.setAttribute('aria-hidden', 'true');
+  ['far', 'near'].forEach(function (k) {
+    var i = document.createElement('i');
+    i.className = k;
+    sc.appendChild(i);
+  });
+  var sun = document.createElement('div');
+  sun.className = 'sun';
+  sc.appendChild(sun);
+  var mist = document.createElement('div');
+  mist.className = 'mist';
+  sc.appendChild(mist);
+  document.body.appendChild(edge);
+  document.body.appendChild(sc);
 })();
 </script>
 </body>
